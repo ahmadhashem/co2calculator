@@ -1,14 +1,57 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
 plugins {
     id 'java'
+    id 'application'
+    id 'maven'
+    id 'jacoco'
 }
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 group 'com.sap.co2calculator'
 version '0.0.1'
+
+mainClassName = 'com.sap.co2calculator.MainEntryPoint'
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.sap.co2calculator.MainEntryPoint'
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    compile group: 'info.picocli', name: 'picocli', version: '4.5.2'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.0'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.0'
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.12.0'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.0'
+
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
+    testCompile "com.github.tomakehurst:wiremock-jre8:2.27.2"
+    testCompile "com.github.stefanbirkner:system-lambda:1.1.1"
+    testCompile "org.mockito:mockito-core:2.+"
+}
+
+
+test {
+    finalizedBy jacocoTestReport // report is always generated after tests run
+}
+
+jacocoTestReport {
+    dependsOn test // tests are required to run before generating the report
 }
